@@ -1,3 +1,4 @@
+from datetime import datetime
 from bson import json_util, ObjectId
 from flask import Flask, request, abort, jsonify
 
@@ -44,6 +45,9 @@ def interactions():
         abort(400, description='engagementId not provided')
 
     query['engagementId'] = ObjectId(request.args['engagementId'])
+
+    if 'interactionDate' in request.args:
+        query['interactionDate'] = datetime.strptime(request.args['interactionDate'], '%Y%m%d')
 
     return json_util.dumps(db.interactions.find(query))
 
