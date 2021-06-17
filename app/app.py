@@ -47,7 +47,7 @@ def interactions():
     query['engagementId'] = ObjectId(request.args['engagementId'])
 
     if 'interactionDate' in request.args:
-        query['interactionDate'] = datetime.strptime(request.args['interactionDate'], '%Y%m%d')
+        query['interactionDate'] = datetime.strptime(request.args['interactionDate'], '%Y%m%d%H')
 
     return json_util.dumps(db.interactions.find(query))
 
