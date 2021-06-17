@@ -1,5 +1,5 @@
 from bson import json_util, ObjectId
-from flask import Flask
+from flask import Flask, request, abort, jsonify
 
 from app.helpers import mongo_client
 
@@ -7,7 +7,6 @@ API_VERSION = '1.0'
 
 app = Flask(__name__)
 db = mongo_client()
-
 
 @app.route('/')
 def root():
@@ -39,11 +38,22 @@ def engagements_by_id(engagement_id):
 
 @app.route('/interactions')
 def interactions():
-    # TODO: Modify this endpoint according to problem statement!
-    return json_util.dumps(db.interactions.find({}))
+    query = {}
+
+    if 'engagementId' not in request.args:
+        abort(400, description='engagementId not provided')
+
+    query['engagementId'] = ObjectId(request.args['engagementId'])
+
+    return json_util.dumps(db.interactions.find(query))
 
 
 @app.route('/interactions/<interaction_id>')
 def interactions_by_id(interaction_id):
     interaction_object_id = ObjectId(interaction_id)
     return json_util.dumps(db.interactions.find_one({'_id': interaction_object_id}))
+
+
+@app.errorhandler(400)
+def bad_request(e):
+    return jsonify(error=str(e)), 400
